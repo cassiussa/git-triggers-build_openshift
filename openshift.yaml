@@ -135,3 +135,80 @@ spec:
               secretName: git-triggers-build-secret
   schedule: '*/5 * * * *'
   suspend: false
+---
+apiVersion: v1
+kind: DeploymentConfig
+metadata:
+  name: git-triggers-build-web
+  labels:
+    app: git-triggers-build
+spec:
+  strategy:
+    type: Rolling
+    recreateParams:
+      timeoutSeconds: 600
+    rollingParams:
+      updatePeriodSeconds: 1
+      intervalSeconds: 1
+      timeoutSeconds: 600
+      maxUnavailable: 0
+      maxSurge: 1
+    resources: {}
+    activeDeadlineSeconds: 21600
+  triggers:
+    - type: ImageChange
+      imageChangeParams:
+        containerNames:
+          - git-triggers-build-web
+        from:
+          kind: ImageStreamTag
+          name: 'git-triggers-build-web:latest'
+    - type: ConfigChange
+  replicas: 1
+  revisionHistoryLimit: 3
+  test: false
+  selector:
+    deploymentconfig: git-triggers-build-web
+    name: git-triggers-build-web
+  template:
+    metadata:
+      name: git-triggers-build-web
+      creationTimestamp: null
+      labels:
+        application: git-triggers-build-web
+        deploymentconfig: git-triggers-build-web
+        name: git-triggers-build-web
+    spec:
+      volumes:
+        - name: git-triggers-build-repositories
+          persistentVolumeClaim:
+            claimName: git-triggers-build-repositories
+      containers:
+        - name: git-triggers-build-web
+          image: 'git-triggers-build-web:latest'
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+          env:
+            - name: ONE
+              value: production
+            - name: TWO
+              value: production
+          resources:
+            limits:
+              cpu: 125m
+              memory: 50Mi
+            requests:
+              cpu: 100m
+              memory: 25Mi
+          volumeMounts:
+            - name: git-triggers-build-repositories
+              readOnly: true
+              mountPath: /repositories
+          terminationMessagePath: /dev/termination-log
+          imagePullPolicy: Always
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+
