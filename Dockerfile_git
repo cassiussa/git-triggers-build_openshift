@@ -1,0 +1,14 @@
+FROM alpine:3.7
+
+LABEL maintainer="Cassius John-Adams <cassius.s.adams@gmail.com>"
+
+RUN echo '@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories && \
+    apk update && \
+    apk upgrade && \
+    apk add ca-certificates && \
+    apk add --no-cache bash git openssh && \
+    rm -rf /var/cache/apk/* && \
+    wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.1/dumb-init_1.2.1_amd64 && \
+    chmod +x /usr/local/bin/dumb-init
+
+ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
