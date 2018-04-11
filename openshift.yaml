@@ -6,19 +6,54 @@ metadata:
   name: git-triggers-build
 ---
 apiVersion: v1
+kind: ImageStream
+metadata:
+  labels:
+    application: git-triggers-build
+  name: git-triggers-build-web
+---
+apiVersion: v1
 kind: Service
 metadata:
   annotations:
     description: The web server's http port.
   labels:
     application: git-triggers-build
-  name: git-triggers-build
+  name: git-triggers-build-web
 spec:
   ports:
   - port: 8080
     targetPort: 8080
   selector:
-    deploymentConfig: git-triggers-build
+    deploymentConfig: git-triggers-build-web
+---
+  apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    name: git-triggers-build-web
+    labels:
+      application: git-triggers-build
+  spec:
+    triggers:
+      - type: ConfigChange
+    runPolicy: SerialLatestOnly
+    source:
+      type: Git
+      git:
+        uri: 'https://github.com/cassiussa/git-triggers-build_openshift.git'
+        ref: develop
+    strategy:
+      type: Docker
+      dockerStrategy:
+        noCache: true
+        forcePull: true
+        dockerfilePath: Dockerfile_web
+    output:
+      to:
+        kind: ImageStreamTag
+        name: 'git-triggers-build-web:latest'
+    resources: {}
+    postCommit: {}
 ---
 apiVersion: v1
 kind: BuildConfig
