@@ -3,7 +3,7 @@ kind: ImageStream
 metadata:
   labels:
     application: git-triggers-build
-name: git-triggers-build
+  name: git-triggers-build
 ---
 apiVersion: v1
 kind: Service
@@ -23,37 +23,41 @@ spec:
 apiVersion: v1
 kind: BuildConfig
 metadata:
+  name: git-triggers-build
   labels:
     application: git-triggers-build
-  name: git-triggers-build
 spec:
+  triggers:
+    - type: ConfigChange
+  runPolicy: SerialLatestOnly
+  source:
+    type: Git
+    git:
+      uri: 'https://github.com/cassiussa/git-triggers-build_openshift.git'
+      ref: develop
+  strategy:
+    type: Docker
+    dockerStrategy:
+      noCache: true
+      forcePull: true
+      dockerfilePath: Dockerfile_git
   output:
     to:
       kind: ImageStreamTag
-      name: git-triggers-build:latest
-  source:
-    git:
-      ref: master
-      uri: https://github.com/cassiussa/git-triggers-build_openshift.git
-    type: Git
-  strategy:
-    sourceStrategy:
-      forcePull: true
-      from:
-        kind: ImageStreamTag
-        name: jboss-eap64-openshift:latest
-        namespace: openshift
-    type: Source
-  triggers:
-  - github:
-      secret: somethinghere
-    type: GitHub
-  - generic:
-      secret: somethingthere
-    type: Generic
-  - imageChange: {}
-    type: ImageChange
-  - type: ConfigChange
+      name: 'git-triggers-build:latest'
+  resources: {}
+  postCommit: {}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: git-triggers-build-repositories
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 250Mi
 ---
 apiVersion: batch/v2alpha1
 kind: CronJob

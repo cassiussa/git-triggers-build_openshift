@@ -13,3 +13,9 @@ nearly the entire CI/CD pipeline without Jenkins if you can just get it to build
 'git-triggers-build_openshift' keeps it simple by running as a Kubernetes CronJob, checking your repositories for
 code changes and then starting your build(s).
 
+
+### OpenShift 3.5 and older
+You will need to manually set the docker registry address in your cronjob.  OpenShift 3.6 and newer support
+mapping of ImageStreams as the container image in 'job' definitions whereas 3.5 and older did not.
+
+ex for OpenShift 3.5 and older: 172.30.0.2:5000/project-name/git-triggers-build:latest 
