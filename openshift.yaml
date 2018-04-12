@@ -25,7 +25,8 @@ spec:
   - port: 8080
     targetPort: 8080
   selector:
-    deploymentConfig: git-triggers-build-web
+    application: git-triggers-build-web
+    name: git-triggers-build-web
 ---
   apiVersion: v1
   kind: BuildConfig
