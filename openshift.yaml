@@ -18,7 +18,7 @@ metadata:
   annotations:
     description: The web server's http port.
   labels:
-    application: git-triggers-build
+    application: git-triggers-build-web
   name: git-triggers-build-web
 spec:
   ports:
@@ -169,6 +169,7 @@ spec:
   test: false
   selector:
     deploymentconfig: git-triggers-build-web
+    application: git-triggers-build-web
     name: git-triggers-build-web
   template:
     metadata:
@@ -185,7 +186,7 @@ spec:
             claimName: git-triggers-build-repositories
       containers:
         - name: git-triggers-build-web
-          image: 'git-triggers-build-web:latest'
+          image: 'git-triggers-build-web'
           ports:
             - containerPort: 8000
               protocol: TCP
