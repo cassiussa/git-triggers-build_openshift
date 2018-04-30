@@ -12,4 +12,4 @@ RUN echo '@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/ap
     chmod +x /usr/local/bin/dumb-init
 
 ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
-CMD ["/bin/sleep", "10"]
+CMD ["/bin/sleep", "600"]

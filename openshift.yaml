@@ -138,7 +138,6 @@ spec:
   suspend: false
 ---
 apiVersion: v1
-apiVersion: apps.openshift.io/v1
 kind: DeploymentConfig
 metadata:
   labels:
@@ -174,10 +173,10 @@ spec:
     spec:
       containers:
         - env:
-            - name: ONE
-              value: production
-            - name: TWO
-              value: production
+            - name: GIT_REPO_PATH
+              value: repositories
+            - name: GIT_REPO_URL
+              value: ssh://git@stash.nm.cbc.ca:7999/~johnadac/sample-web-content.git
           image: git-triggers-build-web
           imagePullPolicy: Always
           name: git-triggers-build-web
@@ -196,7 +195,7 @@ spec:
           volumeMounts:
             - mountPath: /repositories
               name: git-triggers-build-repository
-              readOnly: true
+              readOnly: false
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -206,7 +205,7 @@ spec:
         - name: git-triggers-build-repository
           persistentVolumeClaim:
             claimName: git-triggers-build-repositories
-            defaultMode: 420
+            defaultMode: 440
   test: false
   triggers:
     - imageChangeParams:
