@@ -138,64 +138,52 @@ spec:
   suspend: false
 ---
 apiVersion: v1
+apiVersion: apps.openshift.io/v1
 kind: DeploymentConfig
 metadata:
-  name: git-triggers-build-web
   labels:
     app: git-triggers-build
+  name: git-triggers-build-web
 spec:
-  strategy:
-    type: Rolling
-    recreateParams:
-      timeoutSeconds: 600
-    rollingParams:
-      updatePeriodSeconds: 1
-      intervalSeconds: 1
-      timeoutSeconds: 600
-      maxUnavailable: 0
-      maxSurge: 1
-    resources: {}
-    activeDeadlineSeconds: 21600
-  triggers:
-    - type: ImageChange
-      imageChangeParams:
-        containerNames:
-          - git-triggers-build-web
-        from:
-          kind: ImageStreamTag
-          name: 'git-triggers-build-web:latest'
-    - type: ConfigChange
   replicas: 1
   revisionHistoryLimit: 3
-  test: false
   selector:
-    deploymentconfig: git-triggers-build-web
     application: git-triggers-build-web
+    deploymentconfig: git-triggers-build-web
     name: git-triggers-build-web
+  strategy:
+    activeDeadlineSeconds: 21600
+    recreateParams:
+      timeoutSeconds: 600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 1
+      maxUnavailable: 0
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
   template:
     metadata:
-      name: git-triggers-build-web
       creationTimestamp: null
       labels:
         application: git-triggers-build-web
         deploymentconfig: git-triggers-build-web
         name: git-triggers-build-web
+      name: git-triggers-build-web
     spec:
-      volumes:
-        - name: git-triggers-build-repositories
-          persistentVolumeClaim:
-            claimName: git-triggers-build-repositories
       containers:
-        - name: git-triggers-build-web
-          image: 'git-triggers-build-web'
-          ports:
-            - containerPort: 8000
-              protocol: TCP
-          env:
+        - env:
             - name: ONE
               value: production
             - name: TWO
               value: production
+          image: git-triggers-build-web
+          imagePullPolicy: Always
+          name: git-triggers-build-web
+          ports:
+            - containerPort: 8000
+              protocol: TCP
           resources:
             limits:
               cpu: 125m
@@ -203,14 +191,31 @@ spec:
             requests:
               cpu: 100m
               memory: 25Mi
-          volumeMounts:
-            - name: git-triggers-build-repositories
-              readOnly: true
-              mountPath: /repositories
           terminationMessagePath: /dev/termination-log
-          imagePullPolicy: Always
-      restartPolicy: Always
-      terminationGracePeriodSeconds: 30
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /repositories
+              name: git-triggers-build-repository
+              readOnly: true
       dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
       securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: git-triggers-build-repository
+          persistentVolumeClaim:
+            claimName: git-triggers-build-repositories
+            defaultMode: 420
+  test: false
+  triggers:
+    - imageChangeParams:
+        containerNames:
+          - git-triggers-build-web
+        from:
+          kind: ImageStreamTag
+          name: 'git-triggers-build-web:latest'
+      type: ImageChange
+    - type: ConfigChange
+
 
