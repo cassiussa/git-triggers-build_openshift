@@ -23,7 +23,7 @@ will need to create a Secret object.  Create your secret like this:
 oc create secret generic git-triggers-build-user --from-literal=GIT_TRIGGERS_BUILD_USERNAME=<some-username> --from-literal=GIT_TRIGGERS_BUILD_PASSWORD=<some-password>
 `
 
-Alternatively, instead of using --from-literal you can also do it from file.
+Alternatively, instead of using `--from-literal` you can also do it from file.
 
 
 ### OpenShift 3.5 and older
