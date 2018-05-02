@@ -19,9 +19,9 @@ code changes and then starting your build(s).
 You'll likely need to use credentials to access your git repository if it's not a public repo.  To do that you
 will need to create a Secret object.  Create your secret like this:
 
-`
+```
 oc create secret generic git-triggers-build-user --from-literal=GIT_TRIGGERS_BUILD_USERNAME=<some-username> --from-literal=GIT_TRIGGERS_BUILD_PASSWORD=<some-password>
-`
+```
 
 Alternatively, instead of using `--from-literal` you can also do it from file.
 
