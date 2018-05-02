@@ -30,4 +30,4 @@ Alternatively, instead of using `--from-literal` you can also do it from file.
 You will need to manually set the docker registry address in your cronjob.  OpenShift 3.6 and newer support
 mapping of ImageStreams as the container image in 'job' definitions whereas 3.5 and older did not.
 
-ex for OpenShift 3.5 and older: 172.30.0.2:5000/project-name/git-triggers-build:latest 
+ex for OpenShift 3.5 and older `172.30.0.2:5000/project-name/git-triggers-build:latest`
